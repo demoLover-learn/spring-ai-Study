@@ -2,6 +2,10 @@ package cn.itcast.demo.springaistudy.controller;
 
 import cn.itcast.demo.springaistudy.tools.OrderTools;
 import org.springframework.ai.chat.client.ChatClient;
+
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,11 +23,13 @@ public class ChatController {
     private final ChatClient chatClient;
 
     //chatclient.builder由spring ai自动配置注入
-    public ChatController(ChatClient.Builder builder,OrderTools orderTools) {
+    public ChatController(ChatClient.Builder builder,OrderTools orderTools,ChatMemory chatMemory) {
         this.orderTools = orderTools;
         this.chatClient = builder
                 //注册工具的调用
                 .defaultTools(orderTools)
+                //历史会话记忆(MessageChatMemoryAdvisor.builder(chatMemory).build()
+                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .build();
 
     }
@@ -75,6 +81,17 @@ public class ChatController {
     public String agent(@RequestParam String message){
         return  chatClient.prompt()
                 .user(message)
+                .call()
+                .content();
+    }
+
+
+    //记忆功能的接口
+    @GetMapping("/memory")
+    public String memory(@RequestParam String sessionId,@RequestParam String message){
+        return chatClient.prompt()
+                .user(message)
+                .advisors(a->a.param(ChatMemory.CONVERSATION_ID,sessionId))
                 .call()
                 .content();
     }
