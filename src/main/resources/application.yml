@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: spring-Ai-Study
+  ai:
+    openai:
+      api-key:  sk-bd54eaa4dc384c27bf453e15b12145ce
+      base-url: https://api.deepseek.com
+      chat:
+        model: deepseek-flash
