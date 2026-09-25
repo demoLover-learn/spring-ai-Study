@@ -1,6 +1,8 @@
 package cn.itcast.demo.springaistudy.controller;
 
+import cn.itcast.demo.springaistudy.tools.OrderTools;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,13 +13,19 @@ import java.util.List;
 @RestController
 public class ChatController {
 
-
+    //工具调用
+    private final  OrderTools orderTools;
 
     private final ChatClient chatClient;
 
     //chatclient.builder由spring ai自动配置注入
-    public ChatController(ChatClient.Builder builder){
-        this.chatClient = builder.build();
+    public ChatController(ChatClient.Builder builder,OrderTools orderTools) {
+        this.orderTools = orderTools;
+        this.chatClient = builder
+                //注册工具的调用
+                .defaultTools(orderTools)
+                .build();
+
     }
 
     @GetMapping("/chat")
@@ -60,5 +68,14 @@ public class ChatController {
                 .user("推荐一本关于"+keyword+"的经典书，返回书名，作者，大致价格和3个标签")//用户输入
                 .call()//同步调用
                 .entity(BookInfo.class);//直接映射为java对象
+    }
+
+    //工具调用@Tools
+    @GetMapping("/agent")
+    public String agent(@RequestParam String message){
+        return  chatClient.prompt()
+                .user(message)
+                .call()
+                .content();
     }
 }
