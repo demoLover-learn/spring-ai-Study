@@ -3,7 +3,11 @@ spring:
     name: spring-Ai-Study
   ai:
     openai:
-      api-key:  
+      api-key:
       base-url: https://api.deepseek.com
       chat:
         model: deepseek-flash
+      embedding:
+        base-url: https://maas.qianwenaiapi.com/compatible-mode/v1
+        api-key:
+        model:  text-embedding-v3
