@@ -1,13 +1,6 @@
 package cn.itcast.demo.springaistudy.controller;
-
-import cn.itcast.demo.springaistudy.tools.OrderTools;
 import org.springframework.ai.chat.client.ChatClient;
-
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,24 +12,9 @@ import java.util.List;
 @RestController
 public class ChatController {
 
-    //工具调用
-    private final  OrderTools orderTools;
+    @Autowired
+    private ChatClient chatClient;
 
-    private final ChatClient chatClient;
-
-    //chatclient.builder由spring ai自动配置注入
-    public ChatController(ChatClient.Builder builder, OrderTools orderTools, ChatMemory chatMemory, VectorStore vectorStore) {
-        this.orderTools = orderTools;
-        this.chatClient = builder
-                //注册工具的调用
-                .defaultTools(orderTools)
-                //历史会话记忆(MessageChatMemoryAdvisor.builder(chatMemory).build()
-                //Advisors顾问/增强器，类似于餐厅的服务员
-                .defaultAdvisors(
-//                        MessageChatMemoryAdvisor.builder(chatMemory).build(),
-                        QuestionAnswerAdvisor.builder(vectorStore).build())  //RAG知识库构建
-                .build();
-    }
 
     @GetMapping("/chat")
     public String chat(@RequestParam String message){

@@ -1,12 +1,14 @@
 package cn.itcast.demo.springaistudy.config;
-
-
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.ChatMemoryRepository;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import java.util.List;
 
 @Configuration
 public class BeanConfig {
@@ -22,9 +24,31 @@ public class BeanConfig {
         //SimpleVectorStore = SQLite（轻量级，本地内存，适合测试和学习）
     }
 
+
+    /**
+     * 文本切割
+     * @return
+     */
     @Bean
     public TokenTextSplitter tokenTextSplitter(){
-        return  TokenTextSplitter.builder().build();
+        return  TokenTextSplitter.builder()
+                .withChunkSize(500) //每个块最大的token数，默认是800token
+                .withMinChunkSizeChars(350) //字符数目大于350以及满足chunsize的token大于500才会切割
+                .withPunctuationMarks(List.of('。', '，', '！', '？', '；', '：'))//优先在那些地方去断句
+                .build();
+    }
+
+    /**
+     * 会话记忆
+     * @param chatMemoryRepository
+     * @return
+     */
+    @Bean
+    public ChatMemory chatMemory(ChatMemoryRepository chatMemoryRepository){
+        return MessageWindowChatMemory.builder()
+                .chatMemoryRepository(chatMemoryRepository)
+                .maxMessages(20)    //只保留上下文最大20条记录
+                .build();
     }
 
 }

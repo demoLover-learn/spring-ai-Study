@@ -11,3 +11,6 @@ spring:
         base-url: https://maas.qianwenaiapi.com/compatible-mode/v1
         api-key:
         model:  text-embedding-v3
+logging:
+  level:
+    org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor: debug

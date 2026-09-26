@@ -3,6 +3,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
@@ -11,16 +12,16 @@ import java.nio.file.Path;
 public class IngestService {
 
     // 建议换成 ClassPathResource 或配置化路径
-    private static final Path COURSE_TXT = Path.of("C:\\Users\\Lenovo\\Desktop\\love letter.txt");
+    private static final Path COURSE_TXT = Path.of("C:\\Users\\Lenovo\\Desktop\\456789\\尺码推荐.txt");
     //VectorStore（接口） = “数据库标准协议”（比如 JDBC 接口）。
     private final VectorStore vectorStore;
-    //文本块切割
-    private final TokenTextSplitter splitter;
+    @Autowired
+    private TokenTextSplitter splitter;
 
     // 构造函数注入
-    public IngestService(VectorStore vectorStore, TokenTextSplitter splitter) {
+    public IngestService(VectorStore vectorStore) {
         this.vectorStore = vectorStore;
-        this.splitter = splitter; // 🌟 直接赋值，不要 .builder()
+      // 🌟 直接赋值，不要 .builder()
     }
     //初始化这个 Bean 一创建完，Spring 自动调一次 → 每次启动应用，它都把 `love letter.txt` 重新吃进库里。
     @PostConstruct
